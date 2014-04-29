@@ -60,6 +60,10 @@ package section.DEMO
 		 * 內容列表。
 		 */
 		function toList() : void
+		/*
+		 * 內容列表，以矩陣輸出。
+		 */
+		function toArray( a_output : Array ) : void
 		
 		/*public get/set function：變數存取介面*/
 		/*write only：唯寫*/

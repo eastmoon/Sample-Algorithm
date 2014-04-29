@@ -246,6 +246,26 @@ package section.DEMO.BinarySearchTree
 				this.m_right.toList();
 			}
 		}
+		/*
+		 * 內容列表，以矩陣輸出。
+		 */
+		public function toArray( a_output : Array ) : void
+		{
+			// 左子
+			if( this.m_left != null )
+			{
+				this.m_left.toArray(a_output);
+			}
+			// 本值
+			if( this.keyValue != null )
+				a_output.push( this.keyValue );
+			// 右子
+			if( this.m_right != null )
+			{
+				this.m_right.toArray(a_output);
+			}
+			
+		}
 		/*public get/set function：變數存取介面*/
 		/*write only：唯寫*/
 		/*read only：唯讀*/
