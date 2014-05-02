@@ -16,17 +16,14 @@
 		- Email : Author@email.com
 */
 
-package section.DEMO.RedBlackTree
+package section.DEMO.BinarySearchTree
 {
 	/*import：Flash內建元件庫*/
 	import flash.display.*;
 	import flash.text.TextField;
 	import flash.events.Event;
 	import flash.utils.setInterval;
-	import org.gra.model.RuleModel.Core.*;
-	import org.gra.model.RuleModel.Interface.*;
-	import com.adobe.serialization.json.JSON;
-	import section.DEMO.RM_DataSet.ISearchTreeAlgorithm;
+	import section.DEMO.ISearchTreeAlgorithm;
 		
 	/*external import：外部元件庫、開發人員自定元件庫*/
 		
@@ -50,17 +47,28 @@ package section.DEMO.RedBlackTree
 		}
 		/*public function：對外公開函數*/
 		/*
+		 * 複製物件；數據、連接點不可複製
+		 */
+		public function Clone() : ISearchTreeAlgorithm
+		{
+			return new BSTNode();
+		}
+		/*
 		 * 插入數值，依據演算規則從填入適當的結構。
 		 */
-		public function Insert( a_value : Object ) : void
+		public function Insert( a_value : Object ) : ISearchTreeAlgorithm
 		{
 			// 插入
+			var node : ISearchTreeAlgorithm = this;
 			if( a_value != null )
 			{
+				/*
+				// Recursive method
 				// 0. this node value is null, input value is this.
 				if( this.keyValue == null )
 				{
 					this.m_value = a_value;
+					node = this;
 				}
 				// 1. less than keyValue, push in left
 				else if( a_value <= this.keyValue )
@@ -68,12 +76,15 @@ package section.DEMO.RedBlackTree
 					// 1.1 left is null, create a new one.
 					if( this.m_left == null )
 					{
-						this.m_left = new BSTNode( a_value, this );
+						this.m_left = this.Clone();
+						this.m_left.keyValue = a_value;
+						this.m_left.parentNode = this;
+						node = this.m_left;
 					}
 					// 1.2 left isn't null, push value to node to check.
 					else
 					{
-						this.m_left.Insert( a_value );
+						node = this.m_left.Insert( a_value );
 					}
 					
 				}
@@ -83,15 +94,49 @@ package section.DEMO.RedBlackTree
 					// 2.1 right is null, create a new one.
 					if( this.m_right == null )
 					{
-						this.m_right = new BSTNode( a_value, this );
+						this.m_right = this.Clone();
+						this.m_right.keyValue = a_value;
+						this.m_right.parentNode = this;
+						node = this.m_right;
 					}
 					// 2.2 right isn't null, push value to node to check.
 					else
 					{
-						this.m_right.Insert( a_value );
+						node = this.m_right.Insert( a_value );
 					}
 				}
+				*/
+				// 1. take a node that value is null.
+				while( node.keyValue != null )
+				{
+					// 1.1 less than keyValue, next node is left of node.
+					if( a_value <= node.keyValue )
+					{
+						if( node.leftNode == null )
+						{
+							node.leftNode = this.Clone();
+							node.leftNode.parentNode = node;
+						}
+						else
+							node = node.leftNode;
+					}
+					// 1.2 larger than keyValue, next node is right of node
+					else
+					{
+						if( node.rightNode == null )
+						{
+							node.rightNode = this.Clone();
+							node.rightNode.parentNode = node;
+						}
+						else
+							node = node.rightNode;
+					}
+				}
+				
+				// 1. setting value to node
+				node.keyValue = a_value;				
 			}
+			return node;
 		}
 		/*
 		 * 移除數值，依據演算規則從結構挑選目標刪除，並保持結構完整。
@@ -106,7 +151,8 @@ package section.DEMO.RedBlackTree
 				return null;
 			else
 			{
-				result = new BSTNode( target.keyValue, null );
+				result = this.Clone();
+				result.ReplaceValue( target );
 			}
 				
 			// 2. Choose replace node. 
@@ -232,6 +278,13 @@ package section.DEMO.RedBlackTree
 			}
 		}
 		/*
+		 * 取代，將當前內容的數值更換為目標的數值
+		 */
+		public function ReplaceValue( a_node : ISearchTreeAlgorithm ) : void
+		{
+			this.keyValue = a_node.keyValue;
+		}
+		/*
 		 * 內容列表。
 		 */
 		public function toList() : void
@@ -248,6 +301,26 @@ package section.DEMO.RedBlackTree
 			{
 				this.m_right.toList();
 			}
+		}
+		/*
+		 * 內容列表，以矩陣輸出。
+		 */
+		public function toArray( a_output : Array ) : void
+		{
+			// 左子
+			if( this.m_left != null )
+			{
+				this.m_left.toArray(a_output);
+			}
+			// 本值
+			if( this.keyValue != null )
+				a_output.push( this.keyValue );
+			// 右子
+			if( this.m_right != null )
+			{
+				this.m_right.toArray(a_output);
+			}
+			
 		}
 		/*public get/set function：變數存取介面*/
 		/*write only：唯寫*/
@@ -333,6 +406,44 @@ package section.DEMO.RedBlackTree
 				predecessor = current.parentNode;
 			}
 			return predecessor;
+		}
+		/*
+		 * [唯讀]，祖父結點
+		 */
+		public function get grandparentNode() : ISearchTreeAlgorithm
+		{
+			if( this.parentNode != null )
+				return this.parentNode.parentNode;
+			return null;
+		}
+		/*
+		 * [唯讀]，叔父結點
+		 */
+		public function get uncleNode() : ISearchTreeAlgorithm
+		{
+			var grandparent : ISearchTreeAlgorithm = this.grandparentNode;
+			if( grandparent != null )
+			{
+				if( grandparent.leftNode == this.parentNode )
+					return grandparent.rightNode;
+				else
+					return grandparent.leftNode;
+			}
+			return null;
+		}
+		/*
+		 * [唯讀]，兄弟結點
+		 */
+		public function get siblingNode() : ISearchTreeAlgorithm
+		{
+			if( this.parentNode != null )
+			{
+				if( this.parentNode.leftNode == this )
+					return this.parentNode.rightNode;
+				else
+					return this.parentNode.leftNode;
+			}
+			return null;
 		}
 		/*read/write：讀寫*/
 		/*

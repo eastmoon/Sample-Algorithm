@@ -37,9 +37,13 @@ package section.DEMO
 		/*constructor：建構值*/
 		/*public function：對外公開函數*/
 		/*
+		 * 複製物件；數據、連接點不可複製
+		 */
+		function Clone() : ISearchTreeAlgorithm
+		/*
 		 * 插入數值，依據演算規則從填入適當的結構。
 		 */
-		function Insert( a_value : Object ) : void
+		function Insert( a_value : Object ) : ISearchTreeAlgorithm
 		/*
 		 * 移除數值，依據演算規則從結構挑選目標刪除，並保持結構完整。
 		 */
@@ -56,6 +60,10 @@ package section.DEMO
 		 * 取代，將當前內容更換為輸入目標的內容
 		 */
 		function ReplaceNode( a_node : ISearchTreeAlgorithm ) : void
+		/*
+		 * 取代，將當前內容的數值更換為目標的數值
+		 */
+		function ReplaceValue( a_node : ISearchTreeAlgorithm ) : void
 		/*
 		 * 內容列表。
 		 */
@@ -84,7 +92,18 @@ package section.DEMO
 		 * [唯讀]，最近且小於當前節點值的前任值(節點值)
 		 */
 		function get predecessorNode() : ISearchTreeAlgorithm
-		
+		/*
+		 * [唯讀]，祖父結點
+		 */
+		function get grandparentNode() : ISearchTreeAlgorithm
+		/*
+		 * [唯讀]，叔父結點
+		 */
+		function get uncleNode() : ISearchTreeAlgorithm
+		/*
+		 * [唯讀]，兄弟結點
+		 */
+		function get siblingNode() : ISearchTreeAlgorithm
 		/*read/write：讀寫*/
 		/*
 		 * [讀寫]，存取左子
